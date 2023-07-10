@@ -8,7 +8,7 @@ import type { Movie } from '@/model/movie';
 const props = defineProps<{ open: boolean }>();
 const emit = defineEmits<{ (e: 'close', movie?: Movie): void }>();
 
-const movieInitRaw = {
+const movieInitRaw = () => ({
   id: -1,
   name: '',
   description: '',
@@ -16,23 +16,21 @@ const movieInitRaw = {
   image: '',
   inTheaters: false,
   rating: 0
-};
+});
 
-const movie = ref<Movie>(movieInitRaw);
+const movie = ref<Movie>(movieInitRaw());
 // const errors = ref<Partial<Record<keyof Movie, string>>>({});
 const errors = ref<{ [key in keyof Movie]?: string }>({});
 
 watch(toRef(props, 'open'), () => {
-  console.log('open changes');
   // clear form & errors on both form open and close
   errors.value = {};
-  movie.value = movieInitRaw;
+  movie.value = movieInitRaw();
 });
 
 function validateAndSave() {
   validateForm();
   if (!hasErrors.value) {
-    console.log(movie.value);
     emit('close', movie.value);
   }
 }

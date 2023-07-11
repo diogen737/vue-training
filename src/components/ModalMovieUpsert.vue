@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, toRef, watch } from 'vue';
+import { computed, ref, toRef, toRefs, watch } from 'vue';
 
 import { XMarkIcon } from '@heroicons/vue/24/solid';
 
 import type { Movie } from '@/model/movie';
 
-const props = defineProps<{ open: boolean }>();
+const props = defineProps<{ open: boolean; movieToEdit: Movie | null }>();
 const emit = defineEmits<{ (e: 'close', movie?: Movie): void }>();
 
 const movieInitRaw = () => ({
@@ -19,13 +19,15 @@ const movieInitRaw = () => ({
 });
 
 const movie = ref<Movie>(movieInitRaw());
-// const errors = ref<Partial<Record<keyof Movie, string>>>({});
 const errors = ref<{ [key in keyof Movie]?: string }>({});
+const editMode = ref(false);
+const { open, movieToEdit } = toRefs(props);
 
-watch(toRef(props, 'open'), () => {
+watch(open, () => {
   // clear form & errors on both form open and close
   errors.value = {};
-  movie.value = movieInitRaw();
+  editMode.value = !!movieToEdit.value;
+  movie.value = editMode.value ? Object.assign({}, movieToEdit.value) : movieInitRaw();
 });
 
 function validateAndSave() {

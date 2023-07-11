@@ -1,15 +1,24 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import NewMovieModal from '@/components/ModalNewMovie.vue';
-import { StarIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/solid';
+import ModalMovieUpsert from '@/components/ModalMovieUpsert.vue';
+import { StarIcon, TrashIcon, PlusIcon, PencilIcon } from '@heroicons/vue/24/solid';
 import { items } from './assets/movies.json';
 
 import type { Movie } from './model/movie';
 import { generateMovieId } from './utils';
 
+/**
+ * state
+ */
+
 const movies = ref<Movie[]>(items);
-const newMovieModalOpen = ref(false);
+const movieToEdit = ref<Movie | null>(null);
+const movieModalOpen = ref(false);
+
+/**
+ * getters
+ */
 
 const avgRating = computed(() => {
   const sum = movies.value.reduce((acc, curr) => acc + (curr.rating || 0), 0);
@@ -19,27 +28,61 @@ const avgRatingFormatted = computed(() =>
   Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(avgRating.value)
 );
 
+/**
+ * modal functions
+ */
+
+function openCreateModal() {
+  movieToEdit.value = null;
+  movieModalOpen.value = true;
+}
+
+function openUpdateModal(movie: Movie) {
+  movieToEdit.value = movie;
+  movieModalOpen.value = true;
+}
+
 function onModalClose(payload?: Movie) {
-  newMovieModalOpen.value = false;
+  movieToEdit.value = null;
+  movieModalOpen.value = false;
   if (payload) {
-    addMovie(payload);
+    movieIndex(payload).exists ? updateMovie(payload) : createMovie(payload);
   }
 }
 
-function addMovie(movie: Movie) {
+/**
+ * movies CRUD
+ * TODO: move to a store
+ */
+function createMovie(movie: Movie) {
   movie.id = generateMovieId(movies.value);
-  console.log(movie.id);
   movies.value.push(movie);
 }
 
-function deleteMovie(index: number) {
-  if (index >= 0) {
-    movies.value.splice(index);
+function updateMovie(movie: Movie) {
+  // redundant check (if crud operations become async in the future)
+  const { idx, exists } = movieIndex(movie);
+  if (!exists) {
+    return;
+  }
+  Object.assign(movies.value[idx], movie);
+}
+
+function deleteMovie(movie: Movie) {
+  // redundant check (if crud operations become async in the future)
+  const { idx, exists } = movieIndex(movie);
+  if (exists) {
+    movies.value.splice(idx, 1);
   }
 }
 
 function resetRatings() {
   movies.value.forEach((m) => (m.rating = 0));
+}
+
+function movieIndex(movie: Movie) {
+  const idx = movies.value.findIndex((m) => m.id === movie.id);
+  return { idx, exists: idx > -1 };
 }
 </script>
 
@@ -60,14 +103,13 @@ function resetRatings() {
           class="inline-flex items-center mr-2 text-white bg-amber-700 hover:bg-amber-800 focus:ring-4 focus:ring-amber-300 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-amber-600 dark:hover:bg-amber-700 focus:outline-none dark:focus:ring-amber-800"
           @click="resetRatings"
         >
-          <PlusIcon class="w-4 mr-2" />
           Reset ratings
         </button>
 
         <button
           type="button"
-          class="inline-flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-          @click="newMovieModalOpen = true"
+          class="inline-flex items-center text-white bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-emerald-600 dark:hover:bg-emerald-700 focus:outline-none dark:focus:ring-emerald-800"
+          @click="openCreateModal"
         >
           <PlusIcon class="w-4 mr-2" />
           Add a movie
@@ -76,11 +118,7 @@ function resetRatings() {
     </div>
 
     <div class="grid grid-cols-2 gap-5">
-      <div
-        v-for="(movie, movieIndex) in movies"
-        :key="movie.id"
-        class="col-span-full xl:col-span-1"
-      >
+      <div v-for="movie in movies" :key="movie.id" class="col-span-full xl:col-span-1">
         <div
           class="relative md:max-h-56 overflow-hidden flex flex-col border rounded-lg shadow md:flex-row md:max-w- border-gray-700 bg-gray-800"
         >
@@ -104,12 +142,22 @@ function resetRatings() {
                   {{ movie.name }}
                 </h5>
 
-                <button
-                  class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800 dark:hover:bg-red-500"
-                  @click="deleteMovie(movieIndex)"
-                >
-                  <TrashIcon class="w-4" />
-                </button>
+                <div class="shrink-0">
+                  <button
+                    class="mr-2 text-sky-700 border border-sky-700 hover:bg-sky-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:border-sky-500 dark:text-sky-500 dark:hover:text-white dark:focus:ring-sky-800 dark:hover:bg-sky-500"
+                    title="Edit movie"
+                    @click="openUpdateModal(movie)"
+                  >
+                    <PencilIcon class="w-4" />
+                  </button>
+                  <button
+                    class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800 dark:hover:bg-red-500"
+                    title="Delete movie"
+                    @click="deleteMovie(movie)"
+                  >
+                    <TrashIcon class="w-4" />
+                  </button>
+                </div>
               </div>
 
               <div class="flex items-center space-x-1 mb-6">
@@ -149,5 +197,5 @@ function resetRatings() {
     </div>
   </div>
 
-  <NewMovieModal :open="newMovieModalOpen" @close="onModalClose" />
+  <ModalMovieUpsert :open="movieModalOpen" :movie-to-edit="movieToEdit" @close="onModalClose" />
 </template>

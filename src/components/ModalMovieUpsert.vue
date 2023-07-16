@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, toRef, toRefs, watch } from 'vue';
+import { computed, onMounted, ref, toRefs } from 'vue';
 
 import { XMarkIcon } from '@heroicons/vue/24/solid';
 
 import type { Movie } from '@/model/movie';
 
-const props = defineProps<{ open: boolean; movieToEdit: Movie | null }>();
-const emit = defineEmits<{ (e: 'close', movie?: Movie): void }>();
+const props = defineProps<{ modelValue: Movie | null }>();
+const emit = defineEmits<{ (e: 'update:modelValue', movie?: Movie): void; (e: 'close'): void }>();
 
 const movieInitRaw = () => ({
   id: -1,
@@ -21,19 +21,17 @@ const movieInitRaw = () => ({
 const movie = ref<Movie>(movieInitRaw());
 const errors = ref<{ [key in keyof Movie]?: string }>({});
 const editMode = ref(false);
-const { open, movieToEdit } = toRefs(props);
+const { modelValue } = toRefs(props);
 
-watch(open, () => {
-  // clear form & errors on both form open and close
-  errors.value = {};
-  editMode.value = !!movieToEdit.value;
-  movie.value = editMode.value ? Object.assign({}, movieToEdit.value) : movieInitRaw();
+onMounted(() => {
+  editMode.value = !!modelValue.value;
+  movie.value = editMode.value ? Object.assign({}, modelValue.value) : movieInitRaw();
 });
 
 function validateAndSave() {
   validateForm();
   if (!hasErrors.value) {
-    emit('close', movie.value);
+    emit('update:modelValue', movie.value);
   }
 }
 
@@ -48,7 +46,7 @@ const hasErrors = computed(() => !!Object.entries(errors.value).filter(([k, v]) 
 </script>
 
 <template>
-  <div v-if="open">
+  <div>
     <!-- Modal backdrop -->
     <div class="fixed inset-0 bg-gray-900 opacity-60"></div>
 

@@ -122,13 +122,32 @@ function movieIndex(movie: Movie) {
       <div v-for="movie in movies" :key="movie.id" class="col-span-full xl:col-span-1">
         <MovieItem
           :movie="movie"
-          @click-update="openUpdateModal(movie)"
-          @click-delete="deleteMovie(movie)"
-          @update-rating="movie.rating = $event"
+          @update="openUpdateModal(movie)"
+          @delete="deleteMovie(movie)"
+          @update:rating="movie.rating = $event"
         />
       </div>
     </div>
   </div>
 
-  <ModalMovieUpsert :open="movieModalOpen" :movie-to-edit="movieToEdit" @close="onModalClose" />
+  <Transition>
+    <ModalMovieUpsert
+      v-if="movieModalOpen"
+      :model-value="movieToEdit"
+      @update:model-value="onModalClose"
+      @close="onModalClose"
+    />
+  </Transition>
 </template>
+
+<style>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+</style>

@@ -5,9 +5,9 @@ import type { Movie } from '@/model/movie';
 
 defineProps<{ movie: Movie }>();
 defineEmits<{
-  (e: 'clickUpdate'): void;
-  (e: 'clickDelete'): void;
-  (e: 'updateRating', rating: number): void;
+  (e: 'update'): void;
+  (e: 'delete'): void;
+  (e: 'update:rating', rating: number): void;
 }>();
 </script>
 
@@ -39,14 +39,14 @@ defineEmits<{
             <button
               class="mr-2 text-sky-700 border border-sky-700 hover:bg-sky-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:border-sky-500 dark:text-sky-500 dark:hover:text-white dark:focus:ring-sky-800 dark:hover:bg-sky-500"
               title="Edit movie"
-              @click="$emit('clickUpdate')"
+              @click="$emit('update')"
             >
               <PencilIcon class="w-4" />
             </button>
             <button
               class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800 dark:hover:bg-red-500"
               title="Delete movie"
-              @click="$emit('clickDelete')"
+              @click="$emit('delete')"
             >
               <TrashIcon class="w-4" />
             </button>
@@ -59,7 +59,7 @@ defineEmits<{
             :key="ratingIdx"
             :disabled="movie.rating === ratingIdx"
             class="disabled:cursor-not-allowed"
-            @click="$emit('updateRating', ratingIdx)"
+            @click="$emit('update:rating', ratingIdx)"
           >
             <StarIcon
               class="w-4"

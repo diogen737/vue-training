@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 
 import MovieItem from '@/components/MovieItem.vue';
-import MovieForm from '@/components/MovieForm.vue';
 import { PlusIcon } from '@heroicons/vue/24/solid';
 import { items } from '@/assets/movies.json';
 
 import type { Movie } from '@/model/movie';
 import { generateMovieId } from '@/utils';
+
+const MovieForm = defineAsyncComponent(() => import('@/components/MovieForm.vue'));
 
 /**
  * state

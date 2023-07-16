@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, toRefs } from 'vue';
-
-import AppModal from '@/components/AppModal.vue';
+import { computed, defineAsyncComponent, onMounted, ref, toRefs } from 'vue';
 
 import type { Movie } from '@/model/movie';
+
+const AppModal = defineAsyncComponent(() => import('@/components/AppModal.vue'));
 
 const props = defineProps<{ modelValue: Movie | null }>();
 const emit = defineEmits<{ (e: 'update:modelValue', movie?: Movie): void; (e: 'close'): void }>();

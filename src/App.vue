@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 
 import MovieItem from '@/components/MovieItem.vue';
-import ModalMovieUpsert from '@/components/ModalMovieUpsert.vue';
+import MovieForm from '@/components/MovieForm.vue';
 import { PlusIcon } from '@heroicons/vue/24/solid';
 import { items } from '@/assets/movies.json';
 
@@ -131,7 +131,7 @@ function movieIndex(movie: Movie) {
   </div>
 
   <Transition>
-    <ModalMovieUpsert
+    <MovieForm
       v-if="movieModalOpen"
       :model-value="movieToEdit"
       @update:model-value="onModalClose"

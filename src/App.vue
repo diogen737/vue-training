@@ -9,6 +9,7 @@ import type { Movie } from '@/model/movie';
 import { generateMovieId } from '@/utils';
 
 const MovieForm = defineAsyncComponent(() => import('@/components/MovieForm.vue'));
+const AppModal = defineAsyncComponent(() => import('@/components/AppModal.vue'));
 
 /**
  * state
@@ -16,7 +17,7 @@ const MovieForm = defineAsyncComponent(() => import('@/components/MovieForm.vue'
 
 const movies = ref<Movie[]>(items);
 const movieToEdit = ref<Movie | null>(null);
-const movieModalOpen = ref(false);
+const showForm = ref(false);
 
 /**
  * getters
@@ -36,17 +37,17 @@ const avgRatingFormatted = computed(() =>
 
 function openCreateModal() {
   movieToEdit.value = null;
-  movieModalOpen.value = true;
+  showForm.value = true;
 }
 
 function openUpdateModal(movie: Movie) {
   movieToEdit.value = movie;
-  movieModalOpen.value = true;
+  showForm.value = true;
 }
 
 function onModalClose(payload?: Movie) {
   movieToEdit.value = null;
-  movieModalOpen.value = false;
+  showForm.value = false;
   if (payload) {
     movieIndex(payload).exists ? updateMovie(payload) : createMovie(payload);
   }
@@ -131,24 +132,13 @@ function movieIndex(movie: Movie) {
     </div>
   </div>
 
-  <Transition>
-    <MovieForm
-      v-if="movieModalOpen"
-      :model-value="movieToEdit"
-      @update:model-value="onModalClose"
-      @close="onModalClose"
-    />
-  </Transition>
+  <AppModal :show="showForm" @close="onModalClose">
+    <template #title>
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Add a movie to your list</h3>
+    </template>
+
+    <MovieForm :model-value="movieToEdit" @update:model-value="onModalClose" />
+  </AppModal>
 </template>
 
-<style>
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.25s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
-}
-</style>
+<style></style>

@@ -19,11 +19,15 @@ const movieInitRaw = () => ({
 const movie = ref<Movie>(movieInitRaw());
 const errors = ref<{ [key in keyof Movie]?: string }>({});
 const editMode = ref(false);
+const movieNameRef = ref<HTMLInputElement>();
 const { modelValue } = toRefs(props);
 
 onMounted(() => {
   editMode.value = !!modelValue.value;
   movie.value = editMode.value ? Object.assign({}, modelValue.value) : movieInitRaw();
+
+  // for convenience
+  movieNameRef.value?.focus();
 });
 
 function validateAndSave() {
@@ -53,6 +57,7 @@ const hasErrors = computed(() => !!Object.entries(errors.value).filter(([k, v]) 
         </label>
         <input
           id="name"
+          ref="movieNameRef"
           v-model="movie.name"
           placeholder="Movie name"
           :class="[

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { StarIcon, TrashIcon, PencilIcon } from '@heroicons/vue/24/solid';
+import { ArrowRightIcon, StarIcon, TrashIcon, PencilIcon } from '@heroicons/vue/24/solid';
 
 import type { Movie } from '@/model/movie';
 
@@ -35,20 +35,27 @@ defineEmits<{
             {{ movie.name }}
           </h5>
 
-          <div class="shrink-0">
+          <div class="space-x-2 shrink-0">
+            <RouterLink
+              class="text-sky-700 border border-sky-700 hover:bg-sky-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-full text-sm p-2 text-center inline-flex items-center dark:border-sky-500 dark:text-sky-500 dark:hover:text-white dark:focus:ring-sky-800 dark:hover:bg-sky-500"
+              title="See details"
+              :to="'/' + movie.id"
+            >
+              <ArrowRightIcon class="w-3" />
+            </RouterLink>
             <button
-              class="mr-2 text-sky-700 border border-sky-700 hover:bg-sky-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:border-sky-500 dark:text-sky-500 dark:hover:text-white dark:focus:ring-sky-800 dark:hover:bg-sky-500"
+              class="text-sky-700 border border-sky-700 hover:bg-sky-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-full text-sm p-2 text-center inline-flex items-center dark:border-sky-500 dark:text-sky-500 dark:hover:text-white dark:focus:ring-sky-800 dark:hover:bg-sky-500"
               title="Edit movie"
               @click="$emit('update')"
             >
-              <PencilIcon class="w-4" />
+              <PencilIcon class="w-3" />
             </button>
             <button
-              class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800 dark:hover:bg-red-500"
+              class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-full text-sm p-2 text-center inline-flex items-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800 dark:hover:bg-red-500"
               title="Delete movie"
               @click="$emit('delete')"
             >
-              <TrashIcon class="w-4" />
+              <TrashIcon class="w-3" />
             </button>
           </div>
         </div>

@@ -39,7 +39,7 @@ defineEmits<{
             <RouterLink
               class="text-sky-700 border border-sky-700 hover:bg-sky-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-full text-sm p-2 text-center inline-flex items-center dark:border-sky-500 dark:text-sky-500 dark:hover:text-white dark:focus:ring-sky-800 dark:hover:bg-sky-500"
               title="See details"
-              :to="'/' + movie.id"
+              :to="$route.path + '/' + movie.id"
             >
               <ArrowRightIcon class="w-3" />
             </RouterLink>
